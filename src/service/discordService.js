@@ -10,10 +10,10 @@ class DiscordService {
         client_secret: process.env.CLIENT_SECRET,
         grant_type: "authorization_code",
         code: code.toString(),
-        redirect_uri: "http://localhost:5173/quest-admin.test",
+        redirect_uri: "http://localhost:3001/quest-admin.test",
       });
 
-      const output = await axios.post("https://discord.com/api/v10//oauth2/token", formData, {
+      const output = await axios.post("https://discord.com/api/v10/oauth2/token", formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
@@ -33,13 +33,11 @@ class DiscordService {
         };
       }
     }
-
-
   };
 
   static verifyJoinChanel = async(id) => {
     const infoAccount = await DB.query(verifyJoinChanel(id))
-    if (infoAccount.rowCount > 0) {
+    if (infoAccount?.length > 0) {
       return {
         joined: true
       }
