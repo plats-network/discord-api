@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: bot_discord_app
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    depends_on:
+      - db
+    ports:
+    - 3000:3000
+    volumes:
+      - .:/var/www/
+      - static_file:/var/www/static
+      - media_file:/var/www/media
+    networks:
+      - bot-discord-network
+  db:
+    container_name: bot_discord_db
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    restart: always
+    environment:
+      - POSTGRES_HOST=localhost
+      - POSTGRES_USER=tranchinh
+      - POSTGRES_PASSWORD=deploy
+      - POSTGRES_DATABASE=postgres
+    ports:
+      - 5555:5432
+    networks:
+      - bot-discord-network
+networks:
+  bot-discord-network:
+    driver: bridge
+volumes:
+  static_file:
+  media_file:

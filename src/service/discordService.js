@@ -2,6 +2,7 @@ const axios = require('axios');
 const DB = require('../helpers/connect-db')
 const verifyJoinChanel = require('../models/verifyJoinChannel')
 
+
 class DiscordService {
   static oauth2 = async (code) => {
     if (code) {
@@ -37,7 +38,7 @@ class DiscordService {
 
   static verifyJoinChanel = async(id) => {
     const infoAccount = await DB.query(verifyJoinChanel(id))
-    if (infoAccount?.length > 0) {
+    if (infoAccount.rowCount > 0) {
       return {
         joined: true
       }

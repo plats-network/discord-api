@@ -12,7 +12,6 @@ class DiscordController {
 
     verifyJoinChanel = async(req, res, next) => {
         const { id } = req.body;
-        console.log({ id });
         new SuccessResponse({
             metadata: await DiscordService.verifyJoinChanel(id)
         }).send(res)

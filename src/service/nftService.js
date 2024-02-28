@@ -20,7 +20,7 @@ class NFTService {
         message: "Contract Address is not existing",
       };
     }
-    const provider = new WsProvider(process.env.ALEPH_MAINNET_ENDPOINT);
+    const provider = new WsProvider(process.env.ALEPH_TESTNET_ENDPOINT);
     const api = await ApiPromise.create({ provider });
     const abi = new Abi(metadata, api.registry.getChainProperties());
 
