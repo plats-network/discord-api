@@ -28,10 +28,14 @@ class NFTService {
 
     let balance;
     if (network === AZERO_TESTNET || network === ASTAR_TESTNET) {
-      const abi = new Abi(metadata, api.registry.getChainProperties());
-      const contract = new ContractPromise(api, abi, nftAddress);
+
+      const contract = new ContractPromise(api, metadata, nftAddress);
       balance = await this.getBalanceOf(contract, gasLimit, accountAddress);
+
+      console.log({ balance });
+
     } else if (network === PHALA_TESTNET) {
+
       const api = await this.connectApi(network);
       const phatRegistry = await OnChainRegistry.create(api);
       const contractKey = await phatRegistry.getContractKeyOrFail(nftAddress);
@@ -39,15 +43,13 @@ class NFTService {
       // sign to certificate for account
       // phần này e cần thực hiện trước khi mà call api này
       const cert = await this.getCertificate(api);
-      balance = await this.getBalanceOf(contract, gasLimit, cert, accountAddress);
+      balance = await this.getBalanceOfPhala(contract, gasLimit, cert, accountAddress);
     } else {
       return {
         code: 404,
         message: "Network id not support",
       }
     }
-
-    console.log({ balance });
 
     if (balance > 0) {
       return {
@@ -62,13 +64,12 @@ class NFTService {
     }
   };
 
-  static getBalanceOf = async (contract, gasLimit, cert, accountAddress) => {
+  static getBalanceOf = async (contract, gasLimit, accountAddress) => {
     const { result, output } = await contract.query["psp34::balanceOf"](
       accountAddress,
       {
         gasLimit: gasLimit,
-        storageDepositLimit: null,
-        cert,
+        storageDepositLimit: null
       },
       accountAddress
     );
@@ -82,17 +83,24 @@ class NFTService {
     }
   };
 
-  static getContractMetadata = async (addressContract) => {
-    const data = {
-      contract: addressContract,
-    };
-    try {
-      const response = await axios.post(process.env.SUBSCAN_ALEPH_GET_CONTRACT_META_API, data);
-      return response.data;
-    } catch (error) {
-      return null;
+  static getBalanceOfPhala = async (contract, gasLimit,cert, accountId) => {
+    const { result, output } = await contract.query['psp34::balanceOf'](
+        accountId,
+        {
+            gasLimit: gasLimit,
+            storageDepositLimit: null,
+            cert
+        }, accountId
+    );
+    if (result.isOk) {
+        // output the return value
+        const balance = JSON.parse(output.toString());
+        return Number(balance.ok)
+    } else {
+      throw Error(error.message);
     }
-  };
+}
+
 
   static getCertificate = async (api) => {
     const account_private = process.env.PHALA_ACCOUNT;
