@@ -6,8 +6,9 @@ class NFTController {
     check = async (req, res, next) => {
         const nftAddress = req.query.nftAddress;
         const accountAddress = req.query.accountAddress;
+        const network = req.query.network;
         new SuccessResponse({
-            metadata: await NFTService.check({ accountAddress, nftAddress })
+            metadata: await NFTService.check({ accountAddress, nftAddress, network })
         }).send(res)
     }
 }
