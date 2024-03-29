@@ -1,17 +1,15 @@
 const axios = require("axios");
 const DB = require("../helpers/connect-db");
-const { Abi, ContractPromise } = require("@polkadot/api-contract");
+const { ContractPromise } = require("@polkadot/api-contract");
 const { ApiPromise, WsProvider, Keyring } = require("@polkadot/api");
 const { BN, BN_ONE } = require("@polkadot/util");
 require("dotenv").config();
 const metadata = require("../abi/psp34");
 const {
-  signAndSend,
   signCertificate,
   OnChainRegistry,
   options,
   PinkContractPromise,
-  PinkCodePromise,
 } = require("@phala/sdk");
 
 const { END_POINT, AZERO_TESTNET, ASTAR_TESTNET, PHALA_TESTNET } = require("../utils/constant");
@@ -31,8 +29,6 @@ class NFTService {
 
       const contract = new ContractPromise(api, metadata, nftAddress);
       balance = await this.getBalanceOf(contract, gasLimit, accountAddress);
-
-      console.log({ balance });
 
     } else if (network === PHALA_TESTNET) {
 
