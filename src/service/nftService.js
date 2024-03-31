@@ -2,6 +2,8 @@ const axios = require("axios");
 const DB = require("../helpers/connect-db");
 const { ContractPromise } = require("@polkadot/api-contract");
 const { ApiPromise, WsProvider, Keyring } = require("@polkadot/api");
+const {encodeAddress} = require('@polkadot/keyring');
+
 const { BN, BN_ONE } = require("@polkadot/util");
 require("dotenv").config();
 const metadata = require("../abi/psp34");
@@ -18,6 +20,7 @@ const PROOFSIZE = new BN(1_000_000);
 
 class NFTService {
   static check = async ({ accountAddress, nftAddress, network }) => {
+    accountAddress = this.convertAddress(accountAddress, network);
     const api = await this.connectApi(network);
     const gasLimit = api.registry.createType("WeightV2", {
       refTime: MAX_CALL_WEIGHT,
@@ -125,6 +128,19 @@ class NFTService {
 
     return api;
   };
+
+  static convertAddress = (accountAddress, network) => {
+    let address = ""
+    if (network === AZERO_TESTNET) {
+        address = encodeAddress(accountAddress, 42);
+    } else if (network === ASTAR_TESTNET) {
+        address = encodeAddress(accountAddress, 5);
+    }
+    else if (network === PHALA_TESTNET) {
+        address = encodeAddress(accountAddress, 30);
+    }
+    return address;
+}
 }
 
 module.exports = NFTService;
